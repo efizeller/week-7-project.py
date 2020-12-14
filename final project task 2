@@ -1,0 +1,28 @@
+import os #import 'os' so we can write to the termianl
+os.system('pip3 install requests') # installing requests in case the user does not have it
+import time # importing time to be able to format the unix timestamp they return to a readable date
+import requests #import 'requests' to be able to make a connection
+api_key = '69d7e0199a4d6f5f5341e23c3d3475ed' # Your api key
+def start(): # declaring a function to start the program
+    os.system('cls' if os.name == 'nt' else 'clear') #clear the screen
+    user_input = input('Please enter a zip code or city:\n') # prompt the user to input either a city or zip
+    try: # If the code fails at any point meaning their input cannot be converted to an int then it will run the request with city
+        int(user_input) # Trying to turn the user_input into an int
+        api_request = requests.get(f'https://api.openweathermap.org/data/2.5/forecast?zip={user_input}&appid={api_key}') # making the request with zip code
+    except: # Catching for an error
+        api_request = requests.get(f'https://api.openweathermap.org/data/2.5/forecast?q={user_input}&appid={api_key}') # making the request with city
+    result = api_request.json() # storing the json format response into a variable
+    if(result['cod'] == "200"): # is the status code equals 200 (OK) we print the data
+        for value in result["list"]: # Loop through the data
+            print(str(time.ctime(value["dt"])) + ": " + str(int(int(int(value["main"]["temp"]) - 273.15)* 9/5 + 32)) + "°") # print time plus temp
+        pause = input("Press enter to try another or type 'Exit' to quit...\n") # pasusing terminal with a message until they press ENTER
+        if (pause.lower() == 'exit'): # if they input 'Exit'
+             return # quit program
+        start() # Starting again
+    else: # the status code does NOT equal 200 (OK) we print that it wasnt found
+        pause = input("Not found, press enter to try again or type 'Exit' to quit...\n") # pasusing terminal with a message until they press ENTER
+        if (pause.lower() == 'exit'): # if they input 'Exit'
+             return # quit program
+        start() # Starting again
+
+start() # Starting
